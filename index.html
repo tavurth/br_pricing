@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brayns Pricing</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0a0a0f;
+        --surface: #12121a;
+        --surface2: #1a1a26;
+        --border: #2a2a3d;
+        --purple: #7c3aed;
+        --purple-light: #a78bfa;
+        --purple-glow: rgba(124, 58, 237, 0.15);
+        --text: #f1f0ff;
+        --muted: #6b6b8a;
+        --green: #10b981;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        min-height: 100vh;
+        padding: 48px 24px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 56px;
+      }
+
+      .badge {
+        display: inline-block;
+        background: var(--purple-glow);
+        border: 1px solid rgba(124, 58, 237, 0.4);
+        color: var(--purple-light);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 6px 14px;
+        border-radius: 100px;
+        margin-bottom: 20px;
+      }
+
+      h1 {
+        font-size: clamp(28px, 4vw, 48px);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #fff 0%, var(--purple-light) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 12px;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        font-size: 16px;
+        max-width: 480px;
+        margin: 0 auto 32px;
+        line-height: 1.6;
+      }
+
+      /* Billing toggle */
+      .toggle-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 40px;
+      }
+
+      .toggle-label {
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      .toggle {
+        width: 48px;
+        height: 26px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        cursor: pointer;
+        position: relative;
+        transition: background 0.2s;
+      }
+
+      .toggle.active {
+        background: var(--purple);
+        border-color: var(--purple);
+      }
+
+      .toggle-knob {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--muted);
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        transition:
+          transform 0.2s,
+          background 0.2s;
+      }
+
+      .toggle.active .toggle-knob {
+        transform: translateX(22px);
+        background: #fff;
+      }
+
+      .save-tag {
+        background: var(--purple-glow);
+        border: 1px solid rgba(124, 58, 237, 0.35);
+        color: var(--purple-light);
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 100px;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+
+      /* Volume slider */
+      .slider-wrap {
+        max-width: 560px;
+        margin: 0 auto 56px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px 28px;
+      }
+
+      .slider-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 16px;
+      }
+
+      .slider-label {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      .slider-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--purple-light);
+      }
+
+      input[type="range"] {
+        width: 100%;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 4px;
+        border-radius: 4px;
+        background: var(--border);
+        outline: none;
+        cursor: pointer;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--purple);
+        border: 3px solid var(--purple-light);
+        box-shadow: 0 0 12px var(--purple);
+        cursor: pointer;
+      }
+
+      .slider-ticks {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+      }
+
+      .slider-ticks span {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      /* Tier cards */
+      .tiers {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        max-width: 900px;
+        margin: 0 auto 48px;
+      }
+
+      .tier-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .tier-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+
+      .tier-card.t1::before {
+        background: radial-gradient(
+          ellipse at top left,
+          rgba(16, 185, 129, 0.08),
+          transparent 60%
+        );
+      }
+      .tier-card.t2::before {
+        background: radial-gradient(
+          ellipse at top left,
+          rgba(124, 58, 237, 0.1),
+          transparent 60%
+        );
+      }
+      .tier-card.t3::before {
+        background: radial-gradient(
+          ellipse at top left,
+          rgba(239, 68, 68, 0.08),
+          transparent 60%
+        );
+      }
+
+      .tier-card:hover::before {
+        opacity: 1;
+      }
+      .tier-card:hover {
+        border-color: var(--purple);
+        box-shadow: 0 0 24px var(--purple-glow);
+      }
+
+      .tier-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+      }
+      .t1 .tier-dot {
+        background: var(--green);
+        box-shadow: 0 0 8px var(--green);
+      }
+      .t2 .tier-dot {
+        background: var(--purple-light);
+        box-shadow: 0 0 8px var(--purple);
+      }
+      .t3 .tier-dot {
+        background: #f87171;
+        box-shadow: 0 0 8px #ef4444;
+      }
+
+      .tier-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+      }
+
+      .tier-title {
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+
+      .tier-price {
+        margin-bottom: 16px;
+      }
+
+      .price-num {
+        font-size: 36px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+
+      .price-unit {
+        font-size: 13px;
+        color: var(--muted);
+        margin-left: 4px;
+      }
+
+      .tier-monthly {
+        font-size: 12px;
+        color: var(--green);
+        font-weight: 600;
+        margin-bottom: 16px;
+        min-height: 18px;
+      }
+
+      .tier-examples {
+        border-top: 1px solid var(--border);
+        padding-top: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .example-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .example-item::before {
+        content: "";
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--border);
+        flex-shrink: 0;
+      }
+
+      /* Volume band indicator */
+      .band-label {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .band-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 100px;
+        padding: 8px 16px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .band-pill strong {
+        color: var(--purple-light);
+      }
+
+      /* Platform floor note */
+      .floor-note {
+        max-width: 900px;
+        margin: 0 auto 48px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--purple);
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .floor-note strong {
+        color: var(--text);
+      }
+
+      .icon {
+        font-size: 16px;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      /* Savings callout */
+      .savings {
+        max-width: 900px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+      }
+
+      .saving-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 20px;
+        text-align: center;
+      }
+
+      .saving-val {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--purple-light);
+        margin-bottom: 4px;
+      }
+
+      .saving-label {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .discount-badge {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        background: var(--purple-glow);
+        border: 1px solid rgba(124, 58, 237, 0.35);
+        color: var(--purple-light);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        padding: 3px 8px;
+        border-radius: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="badge">Workflow Pricing</div>
+      <h1>Simple. Scalable. Defensible.</h1>
+      <p class="subtitle">
+        Per-workflow pricing that grows with you. Full audit trail included on
+        every tier.
+      </p>
+
+      <div class="toggle-wrap">
+        <span class="toggle-label" id="lbl-monthly" style="color: var(--text)"
+          >Monthly</span
+        >
+        <div class="toggle" id="billingToggle" onclick="switchBilling()">
+          <div class="toggle-knob" id="toggleKnob"></div>
+        </div>
+        <span class="toggle-label" id="lbl-yearly" style="color: var(--muted)"
+          >Annual <span class="save-tag">Save 20%</span></span
+        >
+      </div>
+    </div>
+
+    <div class="slider-wrap">
+      <div class="slider-header">
+        <span class="slider-label">Monthly workflow volume</span>
+        <span class="slider-value" id="volDisplay">25,000 / mo</span>
+      </div>
+      <input type="range" id="volSlider" min="0" max="3" step="1" value="1" />
+      <div class="slider-ticks">
+        <span>10k</span><span>25k</span><span>50k</span><span>100k+</span>
+      </div>
+    </div>
+
+    <div class="band-label">
+      <div class="band-pill">
+        Volume band: <strong id="bandName">25k – 50k / mo</strong> &nbsp;·&nbsp;
+        Platform minimum: <strong id="platformMin">$5,000 / mo</strong>
+      </div>
+    </div>
+
+    <div class="tiers" id="tierCards"></div>
+
+    <div class="floor-note">
+      <span class="icon">🔒</span>
+      <span
+        ><strong>Full audit trail included.</strong> Every workflow execution is
+        logged, timestamped, and exportable for regulatory review. CreditSafe,
+        sanctions checks, and other third-party tool calls run on your API keys
+        — we never touch your tool spend.</span
+      >
+    </div>
+
+    <div class="savings" id="savingsRow"></div>
+
+    <script>
+      const bands = [
+        {
+          label: "10k – 25k / mo",
+          vol: "10,000",
+          platform: "$2,500 / mo",
+          discount: null,
+          t1: 6.0,
+          t2: 25.0,
+          t3: 90.0,
+        },
+        {
+          label: "25k – 50k / mo",
+          vol: "25,000",
+          platform: "$5,000 / mo",
+          discount: "17% off",
+          t1: 4.0,
+          t2: 18.0,
+          t3: 65.0,
+        },
+        {
+          label: "50k – 100k / mo",
+          vol: "50,000",
+          platform: "$8,000 / mo",
+          discount: "35% off",
+          t1: 2.5,
+          t2: 12.0,
+          t3: 40.0,
+        },
+        {
+          label: "100k+ / mo",
+          vol: "100,000",
+          platform: "Negotiated",
+          discount: "Enterprise",
+          t1: null,
+          t2: null,
+          t3: null,
+        },
+      ];
+
+      const tiers = [
+        {
+          key: "t1",
+          cls: "t1",
+          name: "Tier 1",
+          title: "Simple KYC",
+          examples: [
+            "Identity verification",
+            "Basic risk scoring",
+            "Sanctions screening",
+          ],
+          baseVol: 10000,
+        },
+        {
+          key: "t2",
+          cls: "t2",
+          name: "Tier 2",
+          title: "KYB & Due Diligence",
+          examples: [
+            "Business verification",
+            "UBO resolution",
+            "Multi-source entity checks",
+          ],
+          baseVol: 2000,
+        },
+        {
+          key: "t3",
+          cls: "t3",
+          name: "Tier 3",
+          title: "Transaction Monitoring",
+          examples: [
+            "Ongoing surveillance",
+            "AML investigation",
+            "Adverse media monitoring",
+          ],
+          baseVol: 500,
+        },
+      ];
+
+      let billing = "monthly"; // 'monthly' | 'annual'
+
+      function switchBilling() {
+        billing = billing === "monthly" ? "annual" : "monthly";
+        const isAnnual = billing === "annual";
+        document
+          .getElementById("billingToggle")
+          .classList.toggle("active", isAnnual);
+        document.getElementById("lbl-monthly").style.color = isAnnual
+          ? "var(--muted)"
+          : "var(--text)";
+        document.getElementById("lbl-yearly").style.color = isAnnual
+          ? "var(--text)"
+          : "var(--muted)";
+        render(+document.getElementById("volSlider").value);
+      }
+
+      const ANNUAL_DISCOUNT = 0.8; // 20% off
+
+      const fmt = (n) => (n == null ? "Negotiated" : `${n.toFixed(2)}`);
+
+      const fmtK = (n) =>
+        n >= 1000 ? `$${(n / 1000).toFixed(0)}k` : `$${n.toFixed(0)}`;
+
+      function monthlyEst(price, vol) {
+        if (price == null) return "Negotiated";
+        return `~${fmtK(price * vol)} / mo est.`;
+      }
+
+      function render(idx) {
+        const b = bands[idx];
+        document.getElementById("volDisplay").textContent =
+          b.vol.replace(/\d+k/, (s) => s) + " / mo";
+        document.getElementById("bandName").textContent = b.label;
+        document.getElementById("platformMin").textContent = b.platform;
+
+        const mult = billing === "annual" ? ANNUAL_DISCOUNT : 1;
+        const prices = [b.t1, b.t2, b.t3].map((p) =>
+          p != null ? p * mult : null,
+        );
+        const basePrices = [bands[0].t1, bands[0].t2, bands[0].t3];
+
+        document.getElementById("tierCards").innerHTML = tiers
+          .map((t, i) => {
+            const price = prices[i];
+            const disc =
+              idx > 0 && price != null
+                ? Math.round((1 - price / basePrices[i]) * 100)
+                : null;
+            return `
+        <div class="tier-card ${t.cls}">
+          ${disc ? `<div class="discount-badge">${disc}% off</div>` : ""}
+          <div class="tier-name"><span class="tier-dot"></span>${t.name}</div>
+          <div class="tier-title">${t.title}</div>
+          <div class="tier-price">
+            <span class="price-num">${price != null ? fmt(price) : "—"}</span>
+            <span class="price-unit">${price != null ? "/ workflow" : ""}</span>
+          </div>
+          <div class="tier-monthly">${price != null ? monthlyEst(price, t.baseVol) : "Contact sales"}</div>
+          <div class="tier-examples">
+            ${t.examples.map((e) => `<div class="example-item">${e}</div>`).join("")}
+          </div>
+        </div>`;
+          })
+          .join("");
+
+        // savings row
+        const humanCosts = [5.5, 200, 900];
+        const labels = [
+          "Tier 1 vs junior analyst",
+          "Tier 2 vs analyst (2h)",
+          "Tier 3 vs analyst (2 days)",
+        ];
+        document.getElementById("savingsRow").innerHTML = tiers
+          .map((t, i) => {
+            const price = prices[i];
+            if (price == null)
+              return `
+        <div class="saving-card">
+          <div class="saving-val">Custom</div>
+          <div class="saving-label">${labels[i]}</div>
+        </div>`;
+            const saving = Math.round((1 - price / humanCosts[i]) * 100);
+            return `
+        <div class="saving-card">
+          <div class="saving-val">${saving}% cheaper</div>
+          <div class="saving-label">${labels[i]}</div>
+        </div>`;
+          })
+          .join("");
+      }
+
+      const slider = document.getElementById("volSlider");
+      const volLabels = ["10,000", "25,000", "50,000", "100,000+"];
+
+      slider.addEventListener("input", (e) => {
+        const idx = +e.target.value;
+        document.getElementById("volDisplay").textContent =
+          volLabels[idx] + " / mo";
+        render(idx);
+      });
+
+      render(1);
+    </script>
+  </body>
+</html>
